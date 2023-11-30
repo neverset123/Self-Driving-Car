@@ -80,6 +80,76 @@ remove the last fully connected layer and replace with a layer matching the numb
 retrain the network from scratch with randomly initialized weights
 alternatively, you could just use the same strategy as the "large and similar" data case
 
+### Kalman Filter
+![](./docs/EKF.PNG)
+x: state matrix; F: transition matrix; P: state covariance matrix; Q: process covariance matrix;z: measurement vector;H: projection matrix;R: measurement noise covariance matrix;
+The measurement update for lidar will also use the regular Kalman filter equations, since lidar uses linear equations. Only the measurement update for the radar sensor will use the extended Kalman filter equations.
+1. Kalman Filter
+2. Extended Kalman Filter
+use first order taylor expansion (jacobian matrix) to extimate nonlinear transformation (from state space to measurement space in measurment update step).  
+in practice for the first step in update, use the h function directly to map predicted locations x from Cartesian to polar coordinates, instead of Jacobian matrix.
+3. Unscent Kalman Filter
+to tacle nonlinear problem in prediciton step by using sigma points to represent normal distribution. number of sigma points is determined by augmented state vectors
+#### MatrixXd and VectorXd
+VectorXd: 1D
+MatrixXd: multi dimension
+
+#### sensor fusion precedure 
+![](./docs/fusion.png)
+- first measurement - the filter will receive initial measurements of the bicycle's position relative to the car. These measurements will come from a radar or lidar sensor.
+- initialize state and covariance matrices - the filter will initialize the bicycle's position based on the first measurement.
+then the car will receive another sensor measurement after a time period Δt.
+- predict - the algorithm will predict where the bicycle will be after time Δt. One basic way to predict the bicycle location after Δt is to assume the bicycle's velocity is constant; thus the bicycle will have moved velocity * Δt. In the extended Kalman filter lesson, we will assume the velocity is constant.
+- update - the filter compares the "predicted" location with what the sensor measurement says. The predicted location and the measured location are combined to give an updated location. The Kalman filter will put more weight on either the predicted location or the measured location depending on the uncertainty of each value.
+
+## Localization
+*  Belief = probability
+* sense = product followed by normalization
+* move = convolution(addition)
+![](./docs/filter.png)
+1D markov localization(also called histogram filter), Kalman Filters and Particle Filters are Realizations of Bayes Filter.
+localization uses map coordinate, and kalman filter uses vehicle coordinate. 
+![](./docs/bayes_rule.png)
+
+### 1D Markov model
+assumption
+-  future states (the next state) is dependent only upon the current state and not on other preceding states
+- all observations are independent
+
+
+recursive structure
+![](./docs/Markov.png)
+1. Motion model ->prediction step
+$$ p(x_t|x_{t-1}^{(i)}, \mu_t,m) = \sum p(x_t|x_{t-1}^{(i)}, \mu_t, m)bel(x_{t-1}^{(i)}) $$
+2. observation model -> update step
+$$ p(z_t|x_{t}, z_{1:t-1}, \mu_{1:t},m) = p(z_t|x_{t}, m) $$
+--> Markov localization
+$$ bel(x_t) = \eta p(z_t|x_{t},m)*\hat{bel}(x_t) $$
+
+#### Implementation steps
+- extract sensor observations
+    * for each pseudo-position:
+        + get the motion model probability
+        + determine pseudo ranges
+        + get the observation model probability
+        + use the motion and observation model probabilities to calculate the posterior probability
+- normalize posteriors (see helpers.h for a normalization function)
+- update priors (priors --> posteriors)
+### particle filters
+![](./docs/particle_filter.png)
+![](./docs/pseudocode.png)
+#### bike motion model
+![](./docs/bike_motion_model.png)
+#### conversion from vehicle coordinates to map coordiantes??
+
+
+## path planning
+### search
+1. A* search
+2. dynamic proggramming
+try to find some technics !!
+
+
 ## Tools
 ### interactive widgets
 https://github.com/jupyter-widgets/ipywidgets
