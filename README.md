@@ -121,6 +121,8 @@ recursive structure
 ![](./docs/Markov.png)
 1. Motion model ->prediction step
 $$ p(x_t|x_{t-1}^{(i)}, \mu_t,m) = \sum p(x_t|x_{t-1}^{(i)}, \mu_t, m)bel(x_{t-1}^{(i)}) $$
+$$ \mu: control parameter (yaw, pitch, roll rates, velocity)$$
+$$ m: map(grid maps, feature maps) $$ 
 2. observation model -> update step
 $$ p(z_t|x_{t}, z_{1:t-1}, \mu_{1:t},m) = p(z_t|x_{t}, m) $$
 --> Markov localization
@@ -140,7 +142,8 @@ $$ bel(x_t) = \eta p(z_t|x_{t},m)*\hat{bel}(x_t) $$
 ![](./docs/pseudocode.png)
 #### bike motion model
 ![](./docs/bike_motion_model.png)
-#### conversion from vehicle coordinates to map coordiantes??
+#### coordinate system
+![](./docs/coordinates.png)
 
 
 ## path planning
