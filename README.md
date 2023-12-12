@@ -144,13 +144,156 @@ $$ bel(x_t) = \eta p(z_t|x_{t},m)*\hat{bel}(x_t) $$
 ![](./docs/bike_motion_model.png)
 #### coordinate system
 ![](./docs/coordinates.png)
-
+#### localization signal
+road reflectivity(lane marking) and curb like obstacle
 
 ## path planning
 ### search
 1. A* search
 2. dynamic proggramming
 try to find some technics !!
+
+### prediction
+frenet coordinates
+
+#### clusering
+cluster trajectory into 12 (4stops * 3 actions) groups at intersection
+1) Agglomerative Clustering
+2) spectral clustering
+#### prediction approach
+1) model based 
+* identify common driving behaviors(change lane, turn lef, cross street, etc..)
+* define process model for each behavior
+* update beliefs by observation
+* generate new trajectory
+2) data driven
+* offline training:unsupervised clustering and define prototype trajectories
+* online prediction: make prediction based on partial trajectory
+#### naive bayes
+"naive" is because features contribute independently.
+Gaussian Naive Bayes: individual probalities have gaussian distributions
+### behavior control
+#### finite state machine
+suitable for small state space, such as high way driving; should need other approaches in complex scenarios, such as urban driving.
+
+### Navigation
+#### Methods
+1) potential field methods
+2) combinatorial methods
+3) sampling based methods
+* discrete methods: A*, D*, D*-lite, Dijkstra's, ARA*
+* probabilistic methods: RRt, RRT*, PRM
+##### Hybrid A* 
+it is a free-form planer, consider the kinodynamics of vehicle besides the position, which makes the trajectory is drivable. used for parking lots and certain traffic maneuvers such as U turns.
+##### Polynominal Trajectory Generation
+- minimazation of jerk for comfort:  the higher degree item of taylor polynominal expansion than 6 should be 0.
+- feasibility: acceleration, velocity, turn rate.
+- cost function:consider: jerk(longituditional, lateral), distance to obstacles, distance to center line, time to goal.
+### controll
+1) MPC controller
+2) PID controller
+#### PID controller
+$$ \alpha = -\tau_p*CTE -\tau_D*\frac{dCTE}{dt}-\tau_I\sum{CTE}$$
+1. P component: proportional minimize oscillation
+2. D component: monitor the ramp rate of the process value, and prevent it from overshooting the set point
+3. I component: to achieve an adequate response or reaction time
+ 
+##### Twiddle parameter optimization
+```
+def twiddle(tol=0.2): 
+    p = [0, 0, 0]
+    dp = [1, 1, 1]
+    robot = make_robot()
+    x_trajectory, y_trajectory, best_err = run(robot, p)
+
+    it = 0
+    while sum(dp) > tol:
+        print("Iteration {}, best error = {}".format(it, best_err))
+        for i in range(len(p)):
+            p[i] += dp[i]
+            robot = make_robot()
+            x_trajectory, y_trajectory, err = run(robot, p)
+
+            if err < best_err:
+                best_err = err
+                dp[i] *= 1.1
+            else:
+                p[i] -= 2 * dp[i]
+                robot = make_robot()
+                x_trajectory, y_trajectory, err = run(robot, p)
+
+                if err < best_err:
+                    best_err = err
+                    dp[i] *= 1.1
+                else:
+                    p[i] += dp[i]
+                    dp[i] *= 0.9
+        it += 1
+    return p
+```
+
+### System intergration
+#### perception
+![](./docs/Perception_Subsystem.png)
+#### planning
+The major components of the planning subsystem components are route planning(high level of what path to take on map), prediction(predict other objects' behavior), behavioral planning(define the action to take of ego-vehicle), and path planning(generate trajectory for execuation).
+#### ros
+ros is amazing tool (ranging version: from  hydro, indigo, Jade until now kinetic)
+1) master node server acts central repository for parameters; 
+2) any node can publish and subscribee to any topic (topic is based on pub-sub architecture).
+3) service use request-response message passing schema
+
+##### catkin ws
+```
+catkin_init_workspace
+catkin_make
+```
+to create a package
+```
+catkin_create_pkg <your_package_name> [dependency1 dependency2 …]
+```
+
+##### rqt_graph
+it can be used to show graph architecture of ros nodes system
+##### command
+```
+rosnode list
+rostopic list
+# get topic pub sub information
+rostopic info <topic-name>
+# get message type informaiton
+rosmsg info <msg-type>
+# check rostopic data
+rostopic echo <topic-name>
+# make service call
+rosservice call /arm_mover/safe_move "joint_1: 1.57
+# set ros parameter
+rosparam set /arm_mover/max_joint_2_angle 1.57
+# check and install dependencies
+rosdep check <package name>
+rosdep install -i < package name>
+```
+rosrun can run execuable without go into the folder; roslauch can launch multi ros node with one command line.
+##### msg type
+the std_msgs package contains all of the basic message types, and message_generation is required to generate message libraries for all the supported languages (cpp, lisp, python, javascript).
+message in defined under folder msg with extension of .msg.
+Service is defined under srv folder with extension .srv in two sections: one for request message, and another for response message, they are  seperated by dashed line.
+##### visualization
+``` 
+#view camera image
+rqt_image_view /rgb_camera/image_raw
+
+```
+##### logging
+logs can be found in ~/.ros/log or ROS_ROOT/log
+```
+rospy.logdebug(...)
+rospy.loginfo(...)
+rospy.logwarn(...)
+rospy.logerr(...)
+rospy.logfatal(...)
+```
+The loginfo messages are written to Python's stdout, while logwarn, logerr, and logfatal are written to Python's stderr by default. Additionally, loginfo, logwarn, logerr, and logfatal are written to /rosout.
 
 
 ## Tools
