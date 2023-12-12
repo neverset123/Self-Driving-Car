@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="camera_info_publisher" type="yaml_to_camera_info_publisher.py" name="camera_info_publisher" output="screen" />
+    <node pkg="image_proc" type="image_proc" name="image_proc" />
+    <!-- <param name="grasshopper_calibration_yaml" textfile="$(find camera_info_publisher)../../../data/grasshopper_calibration.yml" /> -->
+</launch>
