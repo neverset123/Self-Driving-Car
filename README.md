@@ -1,4 +1,21 @@
 ## Self-Driving-Car
+### sensor
+#### Lidar
+- object detection by setting vertical displacement exceeds a given threshold
+- object detection by finding points that generate inter-ring distances that differ from the expected distance by more than
+a given threshold
+- static map: accumulating static data over time into map by only considering teh nearest detected object
+- dynamic objects detection: by comparing two consecutive scans the areas of change are detected, which will be recognized as moving objects. teh tracker is initialized using particle filters.
+- localization: 1D histogram filter to estimate vehicle's lateral offset relative to map info; the received INS location has to be smoothed with estimated incremental velocity update to avoid coordinate jumps
+- navigation: dynamic programming
+
+  - common road navigation: 
+    by considering road structure global planner rolls out smoothed center lane and laterally shifted lane. Score of the trajectory is sum of following path cost and cumulative cost
+  - free style navigation: 
+    generate arbitrary trajectories irrespective of a specific road structure (hybrid A*: 4D[x,y,heading,direction of motion(forward or reverse)]). it is guided by combined heuristics:  non-holonomic-without-obstacles heuristic and the holonomic-with-obstacles heuristic, the maximum of the two is used. the path is further smoothed by a Conjugate Gradient smoother to avoid rapid changes in steering angles.
+
+- Intersection: identify critical zones at intersections (occupied regions near stop signs)
+
 
 ### CV
 #### Calibration
@@ -20,6 +37,10 @@ Sobel operator is the heart of canny edge detection. it can calculate in defined
 2. There is also HSV color space (hue, saturation, and value), and HLS space (hue, lightness, and saturation). 
 3. hue represents color independent of any change in brightness; Lightness and Value represent different ways to measure the relative lightness or darkness of a color. For example, a dark red will have a similar hue but much lower value for lightness than a light red. Saturation also plays a part in this; saturation is a measurement of colorfulness. So, as colors get lighter and closer to white, they have a lower saturation value, whereas colors that are the most intense, like a bright primary color (imagine a bright red, blue, or yellow), have a high saturation value.
 4. s channel is mostly stable change for lane detection
+
+####  Inverse Perspective Transformation
+
+
 
 ### Neural Networks
 1. AND OR NOT XOR Operation can be expressed by linear Perceptron (weight and bias)
@@ -147,6 +168,23 @@ $$ bel(x_t) = \eta p(z_t|x_{t},m)*\hat{bel}(x_t) $$
 #### localization signal
 road reflectivity(lane marking) and curb like obstacle
 
+### SLAM
+![](./docs/SLAM.PNG)
+SLAM aims at building a globally consistent representation of the environment, leveraging both ego-motion measurements and loop closures(place recognition). by finding loop closures, the robot understands the real topology of the environment, and is able to find shortcuts between locations. the metric information avoid t wrong data
+association and perceptual aliasing.
+- front end: extracts relevant features from the sensor data and associating each measurement to a specific
+landmark (say, 3D point) in the environment(data association)
+    * short term association: track measurements in consecutive frames
+    * long term association: associating new measurements to older landmarks
+- Maximum a posterior (MAP):  unlike Kalman filtering, MAP estimation does not require an explicit
+distinction between motion and observation model: both models are treated as factors and are seamlessly incorporated in the estimation process(factor graphs).
+#### representation
+1) matric map mdoels(recognizing a previously seen place)
+- 2D: landmark-based maps and occupancy grid maps
+- 3D: landmark-based representations(point features, lines, segments, arcs), Low-level raw dense representations(point cloud, polygons), Boundary and spatial-partitioning dense representations(voxels, octree), High-level object-based representations
+2) semantic map models(classifying the place according to semantic labels)
+still has problem in utilizing semantic-based reasoning
+
 ## path planning
 ### search
 1. A* search
@@ -172,9 +210,11 @@ cluster trajectory into 12 (4stops * 3 actions) groups at intersection
 #### naive bayes
 "naive" is because features contribute independently.
 Gaussian Naive Bayes: individual probalities have gaussian distributions
+
 ### behavior control
 #### finite state machine
 suitable for small state space, such as high way driving; should need other approaches in complex scenarios, such as urban driving.
+stuckness detector will trigger exceptional state through waiting timeout or through repeated traversal of a location to overcome stuckness.
 
 ### Navigation
 #### Methods
@@ -185,10 +225,12 @@ suitable for small state space, such as high way driving; should need other appr
 * probabilistic methods: RRt, RRT*, PRM
 ##### Hybrid A* 
 it is a free-form planer, consider the kinodynamics of vehicle besides the position, which makes the trajectory is drivable. used for parking lots and certain traffic maneuvers such as U turns.
-##### Polynominal Trajectory Generation
+##### Trajectory Generation
+1) Polynominal Trajectory Generation
 - minimazation of jerk for comfort:  the higher degree item of taylor polynominal expansion than 6 should be 0.
 - feasibility: acceleration, velocity, turn rate.
-- cost function:consider: jerk(longituditional, lateral), distance to obstacles, distance to center line, time to goal.
+- cost function consider: jerk(longituditional, lateral), distance to obstacles, distance to center line, time to goal.
+
 ### controll
 1) MPC controller
 2) PID controller
