@@ -92,9 +92,9 @@ camera = None # init camera sensor object
 ## Selective execution and visualization
 ##----ID_S1_EX1----
 # exec_data = [] # options are 'pcl_from_rangeimage', 'load_image'
-exec_detection = [] # options are 'bev_from_pcl', 'detect_objects', 'validate_object_labels', 'measure_detection_performance'; options not in the list will be loaded from file
-exec_tracking = ['perform_tracking'] # options are 'perform_tracking' 
-exec_visualization = ['show_tracks', 'make_tracking_movie'] # options are 'show_range_image', 'show_bev', 'show_pcl', 'show_labels_in_image', 'show_objects_and_labels_in_bev', 'show_objects_in_bev_labels_in_camera', 'show_tracks', 'show_detection_performance', 'make_tracking_movie'
+# exec_detection = [] # options are 'bev_from_pcl', 'detect_objects', 'validate_object_labels', 'measure_detection_performance'; options not in the list will be loaded from file
+# exec_tracking = [] # options are 'perform_tracking' 
+# exec_visualization = ['show_range_image'] # options are 'show_range_image', 'show_bev', 'show_pcl', 'show_labels_in_image', 'show_objects_and_labels_in_bev', 'show_objects_in_bev_labels_in_camera', 'show_tracks', 'show_detection_performance', 'make_tracking_movie'
 
 ##----ID_S1_EX2----
 # exec_data = []
@@ -115,10 +115,10 @@ exec_visualization = ['show_tracks', 'make_tracking_movie'] # options are 'show_
 # exec_visualization = ['show_objects_in_bev_labels_in_camera']
 
 ##----ID_S4_EX1,ID_S4_EX3----
-# exec_data = ['pcl_from_rangeimage']
-# exec_detection = ['bev_from_pcl', 'detect_objects', 'validate_object_labels', 'measure_detection_performance']
-# exec_tracking = []
-# exec_visualization = ['show_detection_performance']
+exec_data = ['pcl_from_rangeimage']
+exec_detection = ['bev_from_pcl', 'detect_objects', 'validate_object_labels', 'measure_detection_performance']
+exec_tracking = []
+exec_visualization = ['show_detection_performance']
 
 exec_list = make_exec_list(exec_detection, exec_tracking, exec_visualization)
 vis_pause_time = 0 # set pause time between frames in ms (0 = stop between frames until key is pressed)
@@ -184,7 +184,7 @@ while True:
                 detections = det.detect_objects(lidar_bev, model_det, configs_det)
             else:
                 print('loading detected objects from result file')
-                detections = load_object_from_file(results_fullpath, data_filename, 'detections', cnt_frame)
+                detections = load_object_from_file(results_fullpath, data_filename, 'detections'+'_'+model_name+'_0.5', cnt_frame)
                 #tools.project_detections_into_bev(bev_map, detections, configs, [0,0,255])
         ## Validate object labels
         if 'validate_object_labels' in exec_list:
@@ -200,7 +200,7 @@ while True:
             det_performance = eval.measure_detection_performance(detections, frame.laser_labels, valid_label_flags, configs_det.min_iou)    
         else:
             print('loading detection performance measures from file')
-            det_performance = load_object_from_file(results_fullpath, data_filename, 'det_performance', cnt_frame)   
+            det_performance = load_object_from_file(results_fullpath, data_filename, 'det_performance'+'_'+model_name+'_0.5', cnt_frame)   
 
         det_performance_all.append(det_performance) # store all evaluation results in a list for performance assessment at the end
         
