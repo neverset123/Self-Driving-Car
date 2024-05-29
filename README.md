@@ -18,6 +18,8 @@ a given threshold
 
 
 ### CV
+classical CV: manual feature extraction, poor adaptability to changes in lighting, scale and orientation, interpretable with rule based decision-making, best suited for controlled environments with structured setttings
+Deep CV: automatic feature learning, hierarchical feature learning, requires significant power and large datasets, highly adaptable, but less interpretable
 #### Calibration
 1. asymmetric circle patterns can sometimes yield better results, especially when the camera lens has a high distortion.
 2. Take multiple images of the calibration pattern at different angles and distances. The more the variety, the better the calibration, as it will cover more of the camera's field of view.
