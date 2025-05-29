@@ -18,6 +18,8 @@ a given threshold
 
 
 ### CV
+classical CV: manual feature extraction, poor adaptability to changes in lighting, scale and orientation, interpretable with rule based decision-making, best suited for controlled environments with structured setttings
+Deep CV: automatic feature learning, hierarchical feature learning, requires significant power and large datasets, highly adaptable, but less interpretable
 #### Calibration
 1. asymmetric circle patterns can sometimes yield better results, especially when the camera lens has a high distortion.
 2. Take multiple images of the calibration pattern at different angles and distances. The more the variety, the better the calibration, as it will cover more of the camera's field of view.
@@ -33,10 +35,11 @@ if the shape of an aera is known, hough transformation can connect points into b
 Sobel operator is the heart of canny edge detection. it can calculate in defined direction. with defined threshold of magnitude and direction angle, the target object boundary can be filtered.
 
 #### color
-1. with matplotlib.image.imread you will get RGB; while with cv2.imread() you will get BGR
-2. There is also HSV color space (hue, saturation, and value), and HLS space (hue, lightness, and saturation). 
-3. hue represents color independent of any change in brightness; Lightness and Value represent different ways to measure the relative lightness or darkness of a color. For example, a dark red will have a similar hue but much lower value for lightness than a light red. Saturation also plays a part in this; saturation is a measurement of colorfulness. So, as colors get lighter and closer to white, they have a lower saturation value, whereas colors that are the most intense, like a bright primary color (imagine a bright red, blue, or yellow), have a high saturation value.
-4. s channel is mostly stable change for lane detection
+1. color image is represented as a set of 2D arrays, in which each element represents **intensity** of a primary color channel.
+2. with matplotlib.image.imread you will get RGB; while with cv2.imread() you will get BGR
+3. There is also HSV color space (hue, saturation, and value), and HLS space (hue, lightness, and saturation). 
+4. hue represents color independent of any change in brightness; Lightness and Value represent different ways to measure the relative lightness or darkness of a color. For example, a dark red will have a similar hue but much lower value for lightness than a light red. Saturation also plays a part in this; saturation is a measurement of colorfulness. So, as colors get lighter and closer to white, they have a lower saturation value, whereas colors that are the most intense, like a bright primary color (imagine a bright red, blue, or yellow), have a high saturation value.
+5. s channel is mostly stable change for lane detection
 
 ####  Inverse Perspective Transformation
 
